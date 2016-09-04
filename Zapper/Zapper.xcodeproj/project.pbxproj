@@ -8,13 +8,15 @@
 
 /* Begin PBXBuildFile section */
 		4245DA851D7B3C5B00922339 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4245DA841D7B3C5B00922339 /* AppDelegate.swift */; };
-		4245DA871D7B3C5B00922339 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4245DA861D7B3C5B00922339 /* ViewController.swift */; };
-		4245DA8A1D7B3C5B00922339 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4245DA881D7B3C5B00922339 /* Main.storyboard */; };
+		4245DA871D7B3C5B00922339 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4245DA861D7B3C5B00922339 /* MainViewController.swift */; };
 		4245DA8C1D7B3C5B00922339 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4245DA8B1D7B3C5B00922339 /* Assets.xcassets */; };
 		4245DA8F1D7B3C5B00922339 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4245DA8D1D7B3C5B00922339 /* LaunchScreen.storyboard */; };
 		4245DA9A1D7B3C5B00922339 /* ZapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4245DA991D7B3C5B00922339 /* ZapperTests.swift */; };
 		4245DAA81D7B519700922339 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4245DAA71D7B519700922339 /* Model.swift */; };
 		4245DAAB1D7B6ECB00922339 /* ConnectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4245DAAA1D7B6ECB00922339 /* ConnectionManager.swift */; };
+		42E3B9A51D7BDC540029025E /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E3B9A41D7BDC540029025E /* Utility.swift */; };
+		42E3B9A81D7C7A700029025E /* MainCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E3B9A61D7C7A700029025E /* MainCollectionCell.swift */; };
+		42E3B9A91D7C7A700029025E /* MainCollectionCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 42E3B9A71D7C7A700029025E /* MainCollectionCell.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,8 +32,7 @@
 /* Begin PBXFileReference section */
 		4245DA811D7B3C5B00922339 /* Zapper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Zapper.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4245DA841D7B3C5B00922339 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		4245DA861D7B3C5B00922339 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		4245DA891D7B3C5B00922339 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		4245DA861D7B3C5B00922339 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		4245DA8B1D7B3C5B00922339 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4245DA8E1D7B3C5B00922339 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		4245DA901D7B3C5B00922339 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -40,6 +41,9 @@
 		4245DA9B1D7B3C5B00922339 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4245DAA71D7B519700922339 /* Model.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 		4245DAAA1D7B6ECB00922339 /* ConnectionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionManager.swift; sourceTree = "<group>"; };
+		42E3B9A41D7BDC540029025E /* Utility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
+		42E3B9A61D7C7A700029025E /* MainCollectionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainCollectionCell.swift; sourceTree = "<group>"; };
+		42E3B9A71D7C7A700029025E /* MainCollectionCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainCollectionCell.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,7 +85,8 @@
 		4245DA831D7B3C5B00922339 /* Zapper */ = {
 			isa = PBXGroup;
 			children = (
-				4245DAAA1D7B6ECB00922339 /* ConnectionManager.swift */,
+				42E3B9AA1D7C7A8D0029025E /* Views */,
+				4245DAAC1D7BA67F00922339 /* Utility */,
 				4245DAA91D7B519D00922339 /* Model */,
 				4245DAA61D7B3CC100922339 /* Supporting Files */,
 				4245DAA41D7B3C9700922339 /* Controllers */,
@@ -102,7 +107,7 @@
 		4245DAA41D7B3C9700922339 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				4245DA861D7B3C5B00922339 /* ViewController.swift */,
+				4245DA861D7B3C5B00922339 /* MainViewController.swift */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -110,7 +115,7 @@
 		4245DAA51D7B3CA000922339 /* Storyboard and Xibs */ = {
 			isa = PBXGroup;
 			children = (
-				4245DA881D7B3C5B00922339 /* Main.storyboard */,
+				42E3B9A71D7C7A700029025E /* MainCollectionCell.xib */,
 				4245DA8D1D7B3C5B00922339 /* LaunchScreen.storyboard */,
 			);
 			name = "Storyboard and Xibs";
@@ -132,6 +137,23 @@
 				4245DAA71D7B519700922339 /* Model.swift */,
 			);
 			name = Model;
+			sourceTree = "<group>";
+		};
+		4245DAAC1D7BA67F00922339 /* Utility */ = {
+			isa = PBXGroup;
+			children = (
+				4245DAAA1D7B6ECB00922339 /* ConnectionManager.swift */,
+				42E3B9A41D7BDC540029025E /* Utility.swift */,
+			);
+			name = Utility;
+			sourceTree = "<group>";
+		};
+		42E3B9AA1D7C7A8D0029025E /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				42E3B9A61D7C7A700029025E /* MainCollectionCell.swift */,
+			);
+			name = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -216,9 +238,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				42E3B9A91D7C7A700029025E /* MainCollectionCell.xib in Resources */,
 				4245DA8F1D7B3C5B00922339 /* LaunchScreen.storyboard in Resources */,
 				4245DA8C1D7B3C5B00922339 /* Assets.xcassets in Resources */,
-				4245DA8A1D7B3C5B00922339 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -236,9 +258,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				42E3B9A51D7BDC540029025E /* Utility.swift in Sources */,
 				4245DAA81D7B519700922339 /* Model.swift in Sources */,
 				4245DAAB1D7B6ECB00922339 /* ConnectionManager.swift in Sources */,
-				4245DA871D7B3C5B00922339 /* ViewController.swift in Sources */,
+				4245DA871D7B3C5B00922339 /* MainViewController.swift in Sources */,
+				42E3B9A81D7C7A700029025E /* MainCollectionCell.swift in Sources */,
 				4245DA851D7B3C5B00922339 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -262,14 +286,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		4245DA881D7B3C5B00922339 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				4245DA891D7B3C5B00922339 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		4245DA8D1D7B3C5B00922339 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -437,6 +453,7 @@
 				4245DAA01D7B3C5B00922339 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		4245DAA11D7B3C5B00922339 /* Build configuration list for PBXNativeTarget "ZapperTests" */ = {
 			isa = XCConfigurationList;
@@ -445,6 +462,7 @@
 				4245DAA31D7B3C5B00922339 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

@@ -8,26 +8,32 @@
 
 import Foundation
 
+enum ImageDownloadState {
+    case New, Downloaded, Failed
+}
+
 struct Wallpaper {
     
     let id: String!
     let thumbnailURL: String!
     let title: String!
     let author: String!
-    let source: String!
+    let actSource: String!
     let preview: Image?
+    let state: DownloadState!
     
     init(jsonObject: NSDictionary) {
         self.id = jsonObject["data"]?["id"] as? String ?? " "
         self.thumbnailURL = jsonObject["data"]?["thumbnail"] as? String ?? " "
         self.title = jsonObject["data"]?["title"] as? String ?? " "
         self.author = jsonObject["data"]?["author"] as? String ?? " "
-        self.source = jsonObject["data"]?["url"] as? String ?? " "
+        self.actSource = jsonObject["data"]?["url"] as? String ?? " "
         if let images = jsonObject["data"]?["preview"]??["images"] as? [NSDictionary] {
             self.preview = Image(jsonObject: images.first!)
         }else {
             self.preview = nil
         }
+        self.state = DownloadState()
     }
 }
 
@@ -64,5 +70,15 @@ struct Resolution {
         self.height = jsonObject["height"] as? Int ?? 0
         self.width = jsonObject["width"] as? Int ?? 0
         self.url = jsonObject["url"] as? String ?? " "
+    }
+}
+
+struct DownloadState {
+    var thumbnailState: ImageDownloadState!
+    var sourceState: ImageDownloadState!
+    
+    init(){
+        self.thumbnailState = .New
+        self.sourceState = .New
     }
 }

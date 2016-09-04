@@ -6,13 +6,14 @@
 //  Copyright © 2016 nravichan. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 class ConnectionManager: NSObject {
     
     static let sharedManager: ConnectionManager = ConnectionManager()
+    var imageCache = NSCache()
     
-    func get(url: String, onSuccess success: (AnyObject)-> Void, onError errorHandler: ()-> Void) {
+    func get(url: String, onSuccess success: (NSData)-> Void, onError errorHandler: ()-> Void) {
         
         if let urlObject = NSURL(string: url) {
             
@@ -27,12 +28,10 @@ class ConnectionManager: NSObject {
             session.dataTaskWithRequest(request, completionHandler: { (responseData, urlResponse, responseError) in
                 
                 if responseError == nil {
-                    do {
-                        let parsed: AnyObject = try NSJSONSerialization.JSONObjectWithData(responseData!, options: .AllowFragments)
-                            success(parsed)
-                        } catch {
-                            NSLog("Could not parse JSON")
-                            errorHandler()
+                    if let _ = responseData {
+                        success(responseData!)
+                    }else {
+                      errorHandler()
                     }
                 }
             }).resume()
@@ -42,4 +41,28 @@ class ConnectionManager: NSObject {
             errorHandler()
         }
     }
+    
+    func loadImageFromURL(url: String, onSuccess success: (NSData)-> Void, onError errorHandler: ()-> Void) {
+        var data: NSData?
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_BACKGROUND, 0)) { 
+            
+            data = self.imageCache.objectForKey(url) as? NSData
+        }
+        
+        if data == nil {
+            get(url, onSuccess: { (imageData) in
+                //Success handler
+                self.imageCache.setObject(imageData, forKey: url)
+                success(imageData)
+                
+            }) {
+                //Error handler
+                errorHandler()
+            }
+        }else {
+            success(data!)
+        }
+        
+    }
 }
+

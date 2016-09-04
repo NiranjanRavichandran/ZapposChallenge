@@ -15,6 +15,9 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+    }
+    
+    func fetchData() {
         ConnectionManager.sharedManager.get(redditAPI, onSuccess: { response in
             
             if let jsonObjects = response["data"]??["children"] as? [NSDictionary] {
@@ -22,18 +25,20 @@ class ViewController: UIViewController {
                 for item in jsonObjects {
                     wallpaperList.append(Wallpaper(jsonObject: item))
                 }
+                //                print("$$$",wallpaperList.first?.thumbnailURL)
             }
             
-            }) {
-
-                //Handle error here
-                
-                dispatch_async(dispatch_get_main_queue(), { 
-                    let alert = UIAlertController(title: "Alert", message: "Oops! Something went wrong.", preferredStyle: .Alert)
-                    alert.addAction(UIAlertAction(title: "Ok", style: .Default, handler: nil))
-                    self.presentViewController(alert, animated: true, completion: nil)
-                })
+        }) {
+            
+            //Handle error here
+            
+            dispatch_async(dispatch_get_main_queue(), {
+                let alert = UIAlertController(title: "Alert", message: "Oops! Something went wrong.", preferredStyle: .Alert)
+                alert.addAction(UIAlertAction(title: "Ok", style: .Default, handler: nil))
+                self.presentViewController(alert, animated: true, completion: nil)
+            })
         }
+
     }
 
     override func didReceiveMemoryWarning() {

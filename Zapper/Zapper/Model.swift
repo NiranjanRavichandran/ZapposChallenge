@@ -71,6 +71,7 @@ struct Resolution {
         self.width = jsonObject["width"] as? Int ?? 0
         self.url = jsonObject["url"] as? String ?? " "
     }
+    
 }
 
 struct DownloadState {

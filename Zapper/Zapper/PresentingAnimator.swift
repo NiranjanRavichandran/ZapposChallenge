@@ -54,5 +54,12 @@ class PresentingAnimator: NSObject,  UIViewControllerAnimatedTransitioning {
                 transitionContext.completeTransition(true)
                 
         }
+        
+        let round = CABasicAnimation(keyPath: "cornerRadius")
+        round.fromValue = presenting ? 20.0/xScaleFactor : 0.0
+        round.toValue = presenting ? 0.0 : 20.0/xScaleFactor
+        round.duration = duration / 2
+        photoView.layer.addAnimation(round, forKey: nil)
+        photoView.layer.cornerRadius = presenting ? 0.0 : 20.0/xScaleFactor
     }
 }

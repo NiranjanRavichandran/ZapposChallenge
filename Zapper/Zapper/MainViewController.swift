@@ -56,10 +56,21 @@ class MainViewController: UIViewController, UICollectionViewDelegate, UICollecti
         self.navigationController?.navigationBar.setBackgroundImage(nil, forBarMetrics: .Default)
         self.navigationController?.navigationBar.clipsToBounds = false
     }
+    
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    override func viewWillLayoutSubviews() {
+        invalidateFlowLayout()
+    }
+    
+    func invalidateFlowLayout() {
+        if let flowLayout = self.collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
+            flowLayout.invalidateLayout()
+        }
     }
     
     override func viewDidLayoutSubviews() {
@@ -68,6 +79,7 @@ class MainViewController: UIViewController, UICollectionViewDelegate, UICollecti
             self.messageLabel.center = self.view.center
         }
     }
+    
     
     //MARK: - Data Loading
     
@@ -166,12 +178,20 @@ class MainViewController: UIViewController, UICollectionViewDelegate, UICollecti
             dispatch_async(dispatch_get_main_queue(), { 
                 cell.imageView.image = UIImage(data: imageData)
                 cell.activitIndicator.stopAnimating()
+                cell.imageView.contentMode = .ScaleAspectFill
 
             })
             
             }) { 
                 //Hanle error
-                NSLog("Could not load image")
+                dispatch_async(dispatch_get_main_queue(), { 
+                    cell.imageView.image = UIImage(named: "badImage.png")
+                    cell.imageView.contentMode = .ScaleAspectFit
+                    cell.activitIndicator.stopAnimating()
+
+                })
+                print("####", imageURL)
+                NSLog("Could not load image - Bad URL")
         }
         
         return cell
@@ -200,7 +220,6 @@ class MainViewController: UIViewController, UICollectionViewDelegate, UICollecti
         let photoVC = PhotoViewController()
         photoVC.imageURL = wallpaperList[indexPath.row].preview?.source?.url
         photoVC.transitioningDelegate = self
-//        self.presentViewController(UINavigationController(rootViewController: photoVC), animated: true, completion: nil)
         self.navigationController?.pushViewController(photoVC, animated: true)
     }
     

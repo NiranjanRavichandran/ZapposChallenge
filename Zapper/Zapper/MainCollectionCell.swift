@@ -20,7 +20,7 @@ class MainCollectionCell: UICollectionViewCell {
         activitIndicator.center = self.center
         self.addSubview(activitIndicator)
         activitIndicator.startAnimating()
-        self.imageView.layer.cornerRadius = 4
+        self.imageView.layer.cornerRadius = 8
         self.imageView.clipsToBounds = true
         self.imageView.contentMode = .ScaleAspectFill
     }

@@ -30,9 +30,10 @@ class ConnectionManager: NSObject {
                 if responseError == nil {
                     if let _ = responseData {
                         success(responseData!)
-                    }else {
-                      errorHandler()
                     }
+                }else {
+                    NSLog("\(responseError)")
+                    errorHandler()
                 }
             }).resume()
             

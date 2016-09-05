@@ -8,7 +8,7 @@
 
 import UIKit
 
-class MainViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
+class MainViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UIViewControllerTransitioningDelegate, UINavigationControllerDelegate {
     
     let redditAPI = "https://www.reddit.com/r/wallpapers/.json?t=week&limit=40"
 
@@ -17,11 +17,16 @@ class MainViewController: UIViewController, UICollectionViewDelegate, UICollecti
     var favorites: [Wallpaper]?
     var segmentControl: UISegmentedControl!
     var isFavorites: Bool = false
+    var messageView: UIView!
+    var messageLabel: UILabel!
+    var transition = PresentingAnimator()
+    var selectedCellImage: UIImageView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = "Reddit Wallpapers"
         self.view.backgroundColor = UIColor.whiteColor()
+        self.navigationController?.delegate = self
         
         //Segment control
         segmentControl = UISegmentedControl(items: ["Top charts", "Favorites"])
@@ -40,13 +45,31 @@ class MainViewController: UIViewController, UICollectionViewDelegate, UICollecti
 
         self.view.addSubview(collectionView)
         
+        self.fetchData()
+    }
+    
+    override func viewWillAppear(animated: Bool) {
         //Navigation bar set up
         self.navigationController?.navigationBar.barTintColor = Utility.appBaseColor
         self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
         self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor()]
-        
-        fetchData()
+        self.navigationController?.navigationBar.setBackgroundImage(nil, forBarMetrics: .Default)
+        self.navigationController?.navigationBar.clipsToBounds = false
     }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    override func viewDidLayoutSubviews() {
+        self.collectionView.frame = self.view.bounds
+        if messageLabel != nil {
+            self.messageLabel.center = self.view.center
+        }
+    }
+    
+    //MARK: - Data Loading
     
     func fetchData() {
         ConnectionManager.sharedManager.get(redditAPI, onSuccess: { response in
@@ -56,9 +79,7 @@ class MainViewController: UIViewController, UICollectionViewDelegate, UICollecti
                     for item in jsonObjects {
                         self.wallpaperList.append(Wallpaper(jsonObject: item))
                     }
-                    print("$$$",self.wallpaperList.first?.actSource)
-                    
-                    dispatch_async(dispatch_get_main_queue(), { 
+                    dispatch_async(dispatch_get_main_queue(), {
                         self.collectionView.reloadData()
                     })
                 }
@@ -74,16 +95,41 @@ class MainViewController: UIViewController, UICollectionViewDelegate, UICollecti
                 self.presentViewController(alert, animated: true, completion: nil)
             })
         }
-
+        
     }
     
     func segmentValueChanged(sender: UISegmentedControl) {
         
+        if sender.selectedSegmentIndex == 0 {
+            isFavorites = false
+            if !collectionView.isDescendantOfView(self.view) {
+                self.view.addSubview(collectionView)
+            }
+        }else {
+            isFavorites = true
+            
+            if favorites?.count > 0 {
+                if !collectionView.isDescendantOfView(self.view) {
+                    self.view.addSubview(collectionView)
+                }
+            }else {
+                self.collectionView.removeFromSuperview()
+                self.showNoFavsView()
+            }
+        }
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    
+    func showNoFavsView() {
+        
+        messageView = UIView(frame: self.view.bounds)
+        messageLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 150, height: 30))
+        messageLabel.textColor = UIColor.darkGrayColor()
+        messageLabel.textAlignment = .Center
+        messageLabel.font = UIFont(name: "Helvetica", size: 20)
+        messageLabel.text = "No favorites yet!"
+        messageLabel.center = messageView.center
+        messageView.addSubview(messageLabel)
+        self.view.addSubview(messageView)
     }
     
     //MARK: - CollectionView DataSource
@@ -108,9 +154,14 @@ class MainViewController: UIViewController, UICollectionViewDelegate, UICollecti
 
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("ImageCell", forIndexPath: indexPath) as! MainCollectionCell
-        let imageObject = wallpaperList[indexPath.row]
+        var imageURL = ""
+        if isFavorites {
+            imageURL = favorites![indexPath.row].thumbnailURL
+        }else {
+            imageURL = wallpaperList[indexPath.row].thumbnailURL
+        }
         
-        ConnectionManager.sharedManager.loadImageFromURL(imageObject.thumbnailURL, onSuccess: { (imageData) in
+        ConnectionManager.sharedManager.loadImageFromURL(imageURL, onSuccess: { (imageData) in
             
             dispatch_async(dispatch_get_main_queue(), { 
                 cell.imageView.image = UIImage(data: imageData)
@@ -140,6 +191,48 @@ class MainViewController: UIViewController, UICollectionViewDelegate, UICollecti
         return 2
     }
     
+    //MARK: - CollectionView Delegate
     
+    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        
+        selectedCellImage = (collectionView.cellForItemAtIndexPath(indexPath) as! MainCollectionCell).imageView
+        
+        let photoVC = PhotoViewController()
+        photoVC.imageURL = wallpaperList[indexPath.row].preview?.source?.url
+        photoVC.transitioningDelegate = self
+//        self.presentViewController(UINavigationController(rootViewController: photoVC), animated: true, completion: nil)
+        self.navigationController?.pushViewController(photoVC, animated: true)
+    }
+    
+    //MARK: - ViewControllerAnimated Transition
+    
+    func animationControllerForPresentedController(presented: UIViewController, presentingController presenting: UIViewController, sourceController source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        
+        transition.originFrame = selectedCellImage.superview!.convertRect(selectedCellImage.frame, toView: nil)
+        transition.presenting = true
+        return transition
+    }
+    
+    func animationControllerForDismissedController(dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        
+        transition.presenting = false
+        return transition
+    }
+    
+    //Mark: - NavigationController delegate
+    
+    func navigationController(navigationController: UINavigationController, animationControllerForOperation operation: UINavigationControllerOperation, fromViewController fromVC: UIViewController, toViewController toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        
+        if operation == .Push {
+            transition.originFrame = selectedCellImage.superview!.convertRect(selectedCellImage.frame, toView: nil)
+            transition.presenting = true
+            return transition
+        }else if operation == .Pop {
+            transition.presenting = false
+            return transition
+        }
+        return nil
+    }
+
 }
 

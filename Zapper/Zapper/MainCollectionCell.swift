@@ -17,6 +17,8 @@ class MainCollectionCell: UICollectionViewCell {
         super.awakeFromNib()
         activitIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 25, height: 25))
         activitIndicator.activityIndicatorViewStyle = .Gray
+        activitIndicator.center = self.center
+        self.addSubview(activitIndicator)
         activitIndicator.startAnimating()
         self.imageView.layer.cornerRadius = 4
         self.imageView.clipsToBounds = true

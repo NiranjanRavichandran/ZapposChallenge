@@ -14,7 +14,7 @@ class Utility {
     
     class var appBaseColor: UIColor {
         
-        return UIColor(red: 87/255, green: 0/255, blue: 192/255, alpha: 1.0)
+        return UIColor(red: 18/255, green: 17/255, blue: 23/255, alpha: 1.0)
     }
     
     class func showSuccess(showForSuccess status: Bool, completion: () -> Void ) {
@@ -57,6 +57,10 @@ class Utility {
                     completion()
             })
         }
+    }
+    
+    class func showNetworkAlert() {
+        
     }
     
 }

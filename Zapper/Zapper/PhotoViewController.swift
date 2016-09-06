@@ -10,10 +10,17 @@ import UIKit
 
 class PhotoViewController: UIViewController, UIViewControllerTransitioningDelegate, UIScrollViewDelegate, UIPopoverPresentationControllerDelegate {
     
-    var imageURL: String?
+    var wallpaper: Wallpaper?
     var imageView: UIImageView!
     var activityIndicator: UIActivityIndicatorView!
     var scrollView: UIScrollView!
+    var favorites: [Wallpaper]?
+    var isFavorite: Bool = false
+    var isFavoriteChanged: Bool = false
+    var panGesture: UIPanGestureRecognizer!
+    
+    let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,13 +41,22 @@ class PhotoViewController: UIViewController, UIViewControllerTransitioningDelega
         self.view.addSubview(activityIndicator)
         activityIndicator.startAnimating()
         
-        let closeButton = UIBarButtonItem(image: UIImage(named: "close.png"), style: .Done, target: self, action: #selector(self.dismissView))
+        panGesture = UIPanGestureRecognizer(target: self, action: #selector(self.dismissView(_:)))
+        self.view.addGestureRecognizer(panGesture)
+        
+        let closeButton = UIBarButtonItem(image: UIImage(named: "close.png"), style: .Done, target: self, action: #selector(self.dismissView(_:)))
         self.navigationItem.leftBarButtonItem = closeButton
         
-        let favButton = UIBarButtonItem(image: UIImage(named: "star.png"), style: .Plain, target: self, action: #selector(self.addFavorite))
+        let favButton = UIBarButtonItem(image: UIImage(named: "star.png"), style: .Plain, target: self, action: #selector(self.addFavorite(_:)))
         let moreButton = UIBarButtonItem(image: UIImage(named: "more.png"), style: .Plain, target: self, action: #selector(self.showActions))
         self.navigationItem.rightBarButtonItems = [moreButton, favButton]
-        print("####", imageURL)
+        
+        if let unarchivedData = appDelegate.appDefaults.objectForKey("favorites") as? NSData {
+            favorites = NSKeyedUnarchiver.unarchiveObjectWithData(unarchivedData) as? [Wallpaper]
+        }else {
+            favorites = [Wallpaper]()
+        }
+        
         
     }
     
@@ -52,18 +68,61 @@ class PhotoViewController: UIViewController, UIViewControllerTransitioningDelega
     
     override func viewDidAppear(animated: Bool) {
 
+        checkForFavorites()
+        
         //Loading image...
         showImage()
+        
+        if isFavorite {
+            let favButton = UIBarButtonItem(image: UIImage(named: "filled_star.png"), style: .Plain, target: self, action: #selector(self.addFavorite(_:)))
+            self.navigationItem.rightBarButtonItems?.insert(favButton, atIndex: 1)
+            self.navigationItem.rightBarButtonItems?.removeAtIndex(2)
+        }
     }
     
-    func addFavorite() {
+    override func viewDidDisappear(animated: Bool) {
+        if isFavoriteChanged {
+            if let _ = favorites {
+                let data = NSKeyedArchiver.archivedDataWithRootObject(favorites!)
+                appDelegate.appDefaults.setObject(data, forKey: "favorites")
+            }
+        }
+    }
+    
+    func addFavorite(sender: UIBarButtonItem) {
+        var favButton: UIBarButtonItem!
+        if isFavorite {
+            isFavorite = false
+            favButton = UIBarButtonItem(image: UIImage(named: "star.png"), style: .Plain, target: self, action: #selector(self.addFavorite(_:)))
+            if let currentFav = wallpaper {
+                favorites = favorites?.filter({ currentFav.id != $0.id })
+            }
+            
+        }else{
+            isFavorite = true
+            favButton = UIBarButtonItem(image: UIImage(named: "filled_star.png"), style: .Plain, target: self, action: #selector(self.addFavorite(_:)))
+            if let newFav = wallpaper {
+                favorites?.append(newFav)
+            }
+        }
         
+        self.navigationItem.rightBarButtonItems?.insert(favButton, atIndex: 1)
+        self.navigationItem.rightBarButtonItems?.removeAtIndex(2)
+        isFavoriteChanged = true
+    }
+    
+    func checkForFavorites(){
+        if let newFav = wallpaper, _ = favorites {
+            if let _ = favorites?.filter({$0.id == newFav.id}).last {
+                isFavorite = true
+            }
+        }
     }
     
     func showActions() {
         
         let moreOptions = UIAlertController(title: nil, message: nil, preferredStyle: .ActionSheet)
-        moreOptions.addAction(UIAlertAction(title: "Save 💾", style: .Default, handler: { _ in
+        moreOptions.addAction(UIAlertAction(title: "💾 Save", style: .Default, handler: { _ in
            //Saving image to camera roll
             if let imageToSave = self.imageView.image {
                 self.activityIndicator.startAnimating()
@@ -72,21 +131,21 @@ class PhotoViewController: UIViewController, UIViewControllerTransitioningDelega
             }
             
         }))
-        moreOptions.addAction(UIAlertAction(title: "Share 📲", style: .Default, handler: { _ in
+        moreOptions.addAction(UIAlertAction(title: "📲 Share", style: .Default, handler: { _ in
             //Share image through other apps
             
-            let textToShare = "Wallpaper Zapper is cool 😎"
+            let textToShare = "Zapper for wallpapers is a cool app 😎"
             if let image = self.imageView.image {
                 let objectsToShare = [image, textToShare]
                 let activity = UIActivityViewController(activityItems: objectsToShare, applicationActivities: nil)
                 activity.popoverPresentationController?.delegate = self
+                activity.excludedActivityTypes = [UIActivityTypeAddToReadingList, UIActivityTypeSaveToCameraRoll]
                 
-                self.presentViewController(activity, animated: true, completion: { 
-                    //Handle completion
-                })
+                self.presentViewController(activity, animated: true, completion: nil)
             }
             
         }))
+        moreOptions.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
         
         //To show popovers on iPads instead of action sheets
         if let optionsPopover = moreOptions.popoverPresentationController {
@@ -114,7 +173,7 @@ class PhotoViewController: UIViewController, UIViewControllerTransitioningDelega
     }
     
     func showImage() {
-        if let url = imageURL {
+        if let url = wallpaper?.sourceURL {
             ConnectionManager.sharedManager.loadImageFromURL(url, onSuccess: { imageData in
                 
                 dispatch_async(dispatch_get_main_queue(), { 
@@ -131,8 +190,15 @@ class PhotoViewController: UIViewController, UIViewControllerTransitioningDelega
         }
     }
     
-    func dismissView() {
-        self.navigationController?.popViewControllerAnimated(true)
+    func dismissView(sender: AnyObject) {
+        if let pan = sender as? UIPanGestureRecognizer {
+            let velocity = pan.velocityInView(self.view)
+            if velocity.y > 0 {
+                self.navigationController?.popViewControllerAnimated(true)
+            }
+        }else {
+            self.navigationController?.popViewControllerAnimated(true)
+        }
     }
 
     override func didReceiveMemoryWarning() {
@@ -174,6 +240,12 @@ class PhotoViewController: UIViewController, UIViewControllerTransitioningDelega
     
     func scrollViewDidZoom(scrollView: UIScrollView) {
         self.centerImageView()
+    }
+    
+    func scrollViewDidEndZooming(scrollView: UIScrollView, withView view: UIView?, atScale scale: CGFloat) {
+        if scale == 1.0 {
+            self.scrollView.panGestureRecognizer.requireGestureRecognizerToFail(panGesture)
+        }
     }
     
     //MARK: - Popover delegate

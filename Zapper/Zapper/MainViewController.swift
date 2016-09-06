@@ -11,6 +11,7 @@ import UIKit
 class MainViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UIViewControllerTransitioningDelegate, UINavigationControllerDelegate {
     
     let redditAPI = "https://www.reddit.com/r/wallpapers/.json?t=week&limit=40"
+    let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
 
     var collectionView: UICollectionView!
     var wallpaperList = [Wallpaper]()
@@ -24,7 +25,6 @@ class MainViewController: UIViewController, UICollectionViewDelegate, UICollecti
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.title = "Reddit Wallpapers"
         self.view.backgroundColor = UIColor.whiteColor()
         self.navigationController?.delegate = self
         
@@ -117,13 +117,18 @@ class MainViewController: UIViewController, UICollectionViewDelegate, UICollecti
             if !collectionView.isDescendantOfView(self.view) {
                 self.view.addSubview(collectionView)
             }
+            self.collectionView.reloadData()
         }else {
             isFavorites = true
+            if let favsData = appDelegate.appDefaults.objectForKey("favorites") as? NSData {
+                favorites = NSKeyedUnarchiver.unarchiveObjectWithData(favsData) as? [Wallpaper]
+            }
             
             if favorites?.count > 0 {
                 if !collectionView.isDescendantOfView(self.view) {
                     self.view.addSubview(collectionView)
                 }
+                self.collectionView.reloadData()
             }else {
                 self.collectionView.removeFromSuperview()
                 self.showNoFavsView()
@@ -218,7 +223,11 @@ class MainViewController: UIViewController, UICollectionViewDelegate, UICollecti
         selectedCellImage = (collectionView.cellForItemAtIndexPath(indexPath) as! MainCollectionCell).imageView
         
         let photoVC = PhotoViewController()
-        photoVC.imageURL = wallpaperList[indexPath.row].preview?.source?.url
+        if isFavorites {
+            photoVC.wallpaper = favorites?[indexPath.row]
+        }else {
+            photoVC.wallpaper = wallpaperList[indexPath.row]
+        }
         photoVC.transitioningDelegate = self
         self.navigationController?.pushViewController(photoVC, animated: true)
     }

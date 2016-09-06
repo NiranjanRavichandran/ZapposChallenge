@@ -8,19 +8,14 @@
 
 import Foundation
 
-enum ImageDownloadState {
-    case New, Downloaded, Failed
-}
-
-struct Wallpaper {
+class Wallpaper: NSObject, NSCoding {
     
     let id: String!
     let thumbnailURL: String!
     let title: String!
     let author: String!
     let actSource: String!
-    let preview: Image?
-    let state: DownloadState!
+    let sourceURL: String!
     
     init(jsonObject: NSDictionary) {
         self.id = jsonObject["data"]?["id"] as? String ?? " "
@@ -29,11 +24,36 @@ struct Wallpaper {
         self.author = jsonObject["data"]?["author"] as? String ?? " "
         self.actSource = jsonObject["data"]?["url"] as? String ?? " "
         if let images = jsonObject["data"]?["preview"]??["images"] as? [NSDictionary] {
-            self.preview = Image(jsonObject: images.first!)
+            let preview = Image(jsonObject: images.first!)
+            self.sourceURL = preview.source?.url ?? " "
         }else {
-            self.preview = nil
+            self.sourceURL = " "
         }
-        self.state = DownloadState()
+    }
+    
+    init(id: String, thumbnailURL: String, title: String, author: String, actSource: String, sourceURL: String) {
+        self.id = id
+        self.actSource = actSource
+        self.author = author
+        self.title = title
+        self.thumbnailURL = thumbnailURL
+        self.sourceURL = sourceURL
+    }
+    
+    required convenience init?(coder decoder: NSCoder) {
+        
+        guard let id = decoder.decodeObjectForKey("id") as? String, thumbnailURL = decoder.decodeObjectForKey("thumbnailURL") as? String, title = decoder.decodeObjectForKey("title") as? String, author = decoder.decodeObjectForKey("author") as? String, aSource = decoder.decodeObjectForKey("actSource") as? String, sourceUrl = decoder.decodeObjectForKey("sourceURL") as? String else { return nil }
+        
+            self.init(id: id, thumbnailURL: thumbnailURL, title: title, author: author, actSource: aSource, sourceURL: sourceUrl)
+    }
+    
+    func encodeWithCoder(aCoder: NSCoder) {
+        aCoder.encodeObject(self.id, forKey: "id")
+        aCoder.encodeObject(self.thumbnailURL, forKey: "thumbnailURL")
+        aCoder.encodeObject(self.title, forKey: "title")
+        aCoder.encodeObject(self.author, forKey: "author")
+        aCoder.encodeObject(self.sourceURL, forKey: "sourceURL")
+        aCoder.encodeObject(self.actSource, forKey: "actSource")
     }
 }
 
@@ -74,12 +94,7 @@ struct Resolution {
     
 }
 
-struct DownloadState {
-    var thumbnailState: ImageDownloadState!
-    var sourceState: ImageDownloadState!
-    
-    init(){
-        self.thumbnailState = .New
-        self.sourceState = .New
-    }
-}
+
+
+
+

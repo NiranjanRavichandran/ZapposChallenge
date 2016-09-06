@@ -19,6 +19,7 @@
 		42E3B9A91D7C7A700029025E /* MainCollectionCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 42E3B9A71D7C7A700029025E /* MainCollectionCell.xib */; };
 		42E3B9AC1D7CC6560029025E /* PhotoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E3B9AB1D7CC6560029025E /* PhotoViewController.swift */; };
 		42E3B9AE1D7D01670029025E /* PresentingAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E3B9AD1D7D01670029025E /* PresentingAnimator.swift */; };
+		42E3B9B01D7E81750029025E /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E3B9AF1D7E81750029025E /* Reachability.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,6 +49,7 @@
 		42E3B9A71D7C7A700029025E /* MainCollectionCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainCollectionCell.xib; sourceTree = "<group>"; };
 		42E3B9AB1D7CC6560029025E /* PhotoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoViewController.swift; sourceTree = "<group>"; };
 		42E3B9AD1D7D01670029025E /* PresentingAnimator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PresentingAnimator.swift; sourceTree = "<group>"; };
+		42E3B9AF1D7E81750029025E /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -150,6 +152,7 @@
 			children = (
 				4245DAAA1D7B6ECB00922339 /* ConnectionManager.swift */,
 				42E3B9A41D7BDC540029025E /* Utility.swift */,
+				42E3B9AF1D7E81750029025E /* Reachability.swift */,
 			);
 			name = Utility;
 			sourceTree = "<group>";
@@ -269,6 +272,7 @@
 				4245DAAB1D7B6ECB00922339 /* ConnectionManager.swift in Sources */,
 				4245DA871D7B3C5B00922339 /* MainViewController.swift in Sources */,
 				42E3B9AC1D7CC6560029025E /* PhotoViewController.swift in Sources */,
+				42E3B9B01D7E81750029025E /* Reachability.swift in Sources */,
 				42E3B9AE1D7D01670029025E /* PresentingAnimator.swift in Sources */,
 				42E3B9A81D7C7A700029025E /* MainCollectionCell.swift in Sources */,
 				4245DA851D7B3C5B00922339 /* AppDelegate.swift in Sources */,

@@ -8,10 +8,11 @@
 
 import UIKit
 
-class MainViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UIViewControllerTransitioningDelegate, UINavigationControllerDelegate {
+class MainViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UIViewControllerTransitioningDelegate, UINavigationControllerDelegate, UIScrollViewDelegate {
     
     let redditAPI = "https://www.reddit.com/r/wallpapers/.json?t=week&limit=40"
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+    var reachability: Reachability?
 
     var collectionView: UICollectionView!
     var wallpaperList = [Wallpaper]()
@@ -27,6 +28,7 @@ class MainViewController: UIViewController, UICollectionViewDelegate, UICollecti
         super.viewDidLoad()
         self.view.backgroundColor = UIColor.whiteColor()
         self.navigationController?.delegate = self
+        self.view.backgroundColor = Utility.appBaseColor
         
         //Segment control
         segmentControl = UISegmentedControl(items: ["Top charts", "Favorites"])
@@ -45,6 +47,20 @@ class MainViewController: UIViewController, UICollectionViewDelegate, UICollecti
 
         self.view.addSubview(collectionView)
         
+        //Network connectivity test
+        do {
+            reachability = try Reachability.reachabilityForInternetConnection()
+        }catch {
+            NSLog("Creating reachability failed.")
+        }
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(MainViewController.reachabilityChanged(_:)),name: ReachabilityChangedNotification,object: reachability)
+        do{
+            try reachability?.startNotifier()
+        }catch{
+            print("could not start reachability notifier")
+        }
+        
         self.fetchData()
     }
     
@@ -55,6 +71,18 @@ class MainViewController: UIViewController, UICollectionViewDelegate, UICollecti
         self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor()]
         self.navigationController?.navigationBar.setBackgroundImage(nil, forBarMetrics: .Default)
         self.navigationController?.navigationBar.clipsToBounds = false
+    }
+    
+    func reachabilityChanged(sender: NSNotification) {
+        let reachability = sender.object as! Reachability
+        
+        if !reachability.isReachable() {
+            Utility.showNetworkAlert({ 
+                self.fetchData()
+            })
+        }else {
+            self.fetchData()
+        }
     }
     
 
@@ -88,6 +116,7 @@ class MainViewController: UIViewController, UICollectionViewDelegate, UICollecti
             
             if let jsonData = response.getJSON() {
                 if let jsonObjects = jsonData["data"]??["children"] as? [NSDictionary] {
+                    self.wallpaperList.removeAll()
                     for item in jsonObjects {
                         self.wallpaperList.append(Wallpaper(jsonObject: item))
                     }
@@ -260,6 +289,36 @@ class MainViewController: UIViewController, UICollectionViewDelegate, UICollecti
             return transition
         }
         return nil
+    }
+    
+    //Mark: - ScrollView delegate
+    
+    func scrollViewDidScroll(scrollView: UIScrollView) {
+        let scrollOffset : CGFloat = scrollView.contentOffset.y
+        let scrollHeight : CGFloat = scrollView.frame.size.height
+        
+        let scrollContentSizeHeight : CGFloat = scrollView.contentSize.height + scrollView.contentInset.bottom
+        
+        if (scrollOffset + scrollHeight) >= scrollContentSizeHeight + 100{
+//            self.bottomRefreshAnimation()
+            print("^^^^^^^^^^")
+            
+        }
+    }
+    
+    func bottomRefreshAnimation() {
+        if self.collectionView.frame.origin.y > 0 {
+            UIView.animateWithDuration(0.4, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: { () -> Void in
+                self.collectionView.frame.origin.y = self.collectionView.frame.origin.y - 40
+                }, completion: nil)
+        }
+    }
+    
+    deinit {
+        reachability?.stopNotifier()
+        NSNotificationCenter.defaultCenter().removeObserver(self,
+                                                            name: ReachabilityChangedNotification,
+                                                            object: reachability)
     }
 
 }

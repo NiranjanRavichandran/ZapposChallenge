@@ -59,8 +59,16 @@ class Utility {
         }
     }
     
-    class func showNetworkAlert() {
-        
+    class func showNetworkAlert(callback: () -> Void) {
+        let alert = UIAlertController(title: "Network Error", message: "Please check you internet connection", preferredStyle: .Alert)
+        alert.addAction(UIAlertAction(title: "Ok", style: .Default, handler: { _ in
+            callback()
+        }))
+        if let keyWindow = UIApplication.sharedApplication().keyWindow {
+            dispatch_async(dispatch_get_main_queue(), { 
+                keyWindow.rootViewController?.presentViewController(alert, animated: true, completion: nil)
+            })
+        }
     }
     
 }
